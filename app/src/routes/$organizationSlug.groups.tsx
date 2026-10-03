@@ -11,21 +11,90 @@ import {
   getSmartDeviceMap,
   getSmartDevicesSnapshot,
 } from "#/lib/smart-devices-snapshot";
+import type { SmartDeviceGroup, SmartDeviceGroupState } from "#/lib/smart-devices";
 import {
   buildZigbee2MqttTopic,
   formatMqttPayloadPreview,
 } from "#/lib/zigbee2mqtt-publish";
 
+type GroupsSearch = {
+  room?: string;
+  state?: SmartDeviceGroupState;
+};
+
+const GROUP_STATE_ORDER: SmartDeviceGroupState[] = ["on", "off", "mixed"];
+
 export const Route = createFileRoute("/$organizationSlug/groups")({
+  validateSearch: (search: Record<string, unknown>): GroupsSearch => ({
+    room: typeof search.room === "string" && search.room ? search.room : undefined,
+    state:
+      typeof search.state === "string" && GROUP_STATE_ORDER.includes(search.state as SmartDeviceGroupState)
+        ? (search.state as SmartDeviceGroupState)
+        : undefined,
+  }),
   component: GroupsRoute,
 });
 
+function countGroupsBy<T extends string>(
+  groups: SmartDeviceGroup[],
+  getKey: (group: SmartDeviceGroup) => T,
+) {
+  return groups.reduce<Record<T, number>>(
+    (counts, group) => ({
+      ...counts,
+      [getKey(group)]: (counts[getKey(group)] ?? 0) + 1,
+    }),
+    {} as Record<T, number>,
+  );
+}
+
+function getRoomOptions(groups: SmartDeviceGroup[]) {
+  return [...new Set(groups.map((group) => group.room ?? "Multi-room"))].sort((a, b) =>
+    a.localeCompare(b),
+  );
+}
+
+function getStateOptions(groups: SmartDeviceGroup[]) {
+  const states = new Set(groups.map((group) => group.state ?? "mixed"));
+  return GROUP_STATE_ORDER.filter((state) => states.has(state));
+}
+
+function buildGroupsHref({
+  organizationSlug,
+  room,
+  state,
+}: {
+  organizationSlug: string;
+  room?: string;
+  state?: string;
+}) {
+  const params = new URLSearchParams();
+  if (room) params.set("room", room);
+  if (state) params.set("state", state);
+
+  const query = params.toString();
+  return `/${organizationSlug}/groups${query ? `?${query}` : ""}`;
+}
+
 function GroupsRoute() {
   const { organizationSlug } = Route.useParams();
+  const search = Route.useSearch();
   const organization = createSmartDevicesOrganizationContext(organizationSlug);
   const snapshot = getSmartDevicesSnapshot(organization.slug);
   const devicesById = getSmartDeviceMap(snapshot);
   const mqttConfig = getSmartDevicesMqttConfig(organization.slug);
+  const roomOptions = getRoomOptions(snapshot.groups);
+  const stateOptions = getStateOptions(snapshot.groups);
+  const roomCounts = countGroupsBy(snapshot.groups, (group) => group.room ?? "Multi-room");
+  const stateCounts = countGroupsBy(snapshot.groups, (group) => group.state ?? "mixed");
+  const onCount = snapshot.groups.filter((group) => group.state === "on").length;
+  const offCount = snapshot.groups.filter((group) => group.state === "off").length;
+  const mixedCount = snapshot.groups.filter((group) => group.state === "mixed").length;
+  const filteredGroups = snapshot.groups.filter((group) => {
+    const room = group.room ?? "Multi-room";
+    const state = group.state ?? "mixed";
+    return (!search.room || room === search.room) && (!search.state || state === search.state);
+  });
 
   return (
     <>
@@ -39,6 +108,85 @@ function GroupsRoute() {
         current provider is mock-backed and can be swapped for live MQTT
         discovery later.
       </SmartDevicesPage>
+
+      <section className="summary-grid" aria-label="Group summary">
+        <article className="summary-card">
+          <span>Total groups</span>
+          <strong>{snapshot.groups.length}</strong>
+        </article>
+        <article className="summary-card">
+          <span>On</span>
+          <strong>{onCount}</strong>
+        </article>
+        <article className="summary-card">
+          <span>Off</span>
+          <strong>{offCount}</strong>
+        </article>
+        <article className="summary-card">
+          <span>Mixed</span>
+          <strong>{mixedCount}</strong>
+        </article>
+        <article className="summary-card">
+          <span>Showing</span>
+          <strong>{filteredGroups.length}</strong>
+        </article>
+      </section>
+
+      <section className="filter-card" aria-label="Group filters">
+        <div>
+          <p className="filter-card__label">Room</p>
+          <div className="filter-pills">
+            <a
+              className="filter-pill"
+              data-active={!search.room ? "true" : undefined}
+              href={buildGroupsHref({ organizationSlug: organization.slug, state: search.state })}
+            >
+              All rooms <span>{snapshot.groups.length}</span>
+            </a>
+            {roomOptions.map((room) => (
+              <a
+                key={room}
+                className="filter-pill"
+                data-active={search.room === room ? "true" : undefined}
+                href={buildGroupsHref({
+                  organizationSlug: organization.slug,
+                  room,
+                  state: search.state,
+                })}
+              >
+                {room} <span>{roomCounts[room]}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="filter-card__label">State</p>
+          <div className="filter-pills">
+            <a
+              className="filter-pill"
+              data-active={!search.state ? "true" : undefined}
+              href={buildGroupsHref({ organizationSlug: organization.slug, room: search.room })}
+            >
+              All states <span>{snapshot.groups.length}</span>
+            </a>
+            {stateOptions.map((state) => (
+              <a
+                key={state}
+                className="filter-pill"
+                data-active={search.state === state ? "true" : undefined}
+                href={buildGroupsHref({
+                  organizationSlug: organization.slug,
+                  room: search.room,
+                  state,
+                })}
+              >
+                {state} <span>{stateCounts[state]}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="config-card" aria-label="MQTT configuration">
         <div>
@@ -63,13 +211,16 @@ function GroupsRoute() {
       </section>
 
       <section className="data-grid" aria-label="Discovered groups">
-        {snapshot.groups.map((group) => {
+        {filteredGroups.map((group) => {
           const commandIntents = createGroupCommandIntents(group);
           const stateTopic = buildZigbee2MqttTopic(mqttConfig, group.zigbee2MqttEntity)
             .replace(/\/set$/, "");
+          const deviceNames = group.deviceIds.map(
+            (deviceId) => devicesById[deviceId]?.friendlyName ?? deviceId,
+          );
 
           return (
-            <article className="data-card" key={group.id}>
+            <article className="data-card data-card--compact" key={group.id}>
               <div className="data-card__header">
                 <div>
                   <p className="data-card__eyebrow">{group.room ?? "Multi-room"}</p>
@@ -80,24 +231,29 @@ function GroupsRoute() {
                 </span>
               </div>
 
-              <dl className="data-list">
-                <div>
-                  <dt>Zigbee2MQTT entity</dt>
-                  <dd>{group.zigbee2MqttEntity}</dd>
-                </div>
-                <div>
-                  <dt>State topic</dt>
-                  <dd>{stateTopic}</dd>
-                </div>
-                <div>
-                  <dt>Devices</dt>
-                  <dd>
-                    {group.deviceIds
-                      .map((deviceId) => devicesById[deviceId]?.friendlyName ?? deviceId)
-                      .join(", ")}
-                  </dd>
-                </div>
-              </dl>
+              <div className="device-card__quick">
+                <span>Group</span>
+                <span>{group.state ?? "unknown"}</span>
+                <span>{deviceNames.length} devices</span>
+              </div>
+
+              <details className="mqtt-details">
+                <summary>Group details</summary>
+                <dl className="data-list">
+                  <div>
+                    <dt>Zigbee2MQTT entity</dt>
+                    <dd>{group.zigbee2MqttEntity}</dd>
+                  </div>
+                  <div>
+                    <dt>State topic</dt>
+                    <dd>{stateTopic}</dd>
+                  </div>
+                  <div>
+                    <dt>Devices</dt>
+                    <dd>{deviceNames.join(", ")}</dd>
+                  </div>
+                </dl>
+              </details>
 
               <div className="command-bar" aria-label={`${group.friendlyName} controls`}>
                 {commandIntents.map((intent) => {
