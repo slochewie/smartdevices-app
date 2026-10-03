@@ -31,3 +31,11 @@ export type SmartDeviceGroup = {
   room?: string;
   state?: "on" | "off" | "mixed";
 };
+
+export type SmartDevicesSnapshot = {
+  organizationSlug: string;
+  source: "mock" | "mqtt";
+  devices: SmartDevice[];
+  groups: SmartDeviceGroup[];
+  capturedAt: string;
+};
