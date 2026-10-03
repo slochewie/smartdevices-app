@@ -41,6 +41,22 @@ export type SmartDeviceMqttPublishRequest = {
   retain: boolean;
 };
 
+export type SmartDeviceCommandExecutionStatus =
+  | "not-wired"
+  | "dry-run"
+  | "queued"
+  | "sent"
+  | "failed";
+
+export type SmartDeviceCommandExecutionResult = {
+  id: string;
+  organizationSlug: string;
+  intent: SmartDeviceCommandIntent;
+  publishRequest: SmartDeviceMqttPublishRequest;
+  status: SmartDeviceCommandExecutionStatus;
+  message: string;
+};
+
 export type SmartDevice = {
   id: string;
   organizationSlug: string;
