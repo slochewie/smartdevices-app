@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 import { submitSmartDeviceCommand } from "#/lib/smart-devices-command-execution";
@@ -25,7 +24,7 @@ function DevicesRoute() {
   const mqttConfig = getSmartDevicesMqttConfig(organization.slug);
 
   return (
-    <AppShell organization={organization}>
+    <>
       <SmartDevicesPage
         organization={organization}
         pageId="devices"
@@ -128,6 +127,6 @@ function DevicesRoute() {
           );
         })}
       </section>
-    </AppShell>
+    </>
   );
 }
