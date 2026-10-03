@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
+import { createGroupCommandIntents } from "#/lib/smart-devices-commands";
 import {
   getSmartDeviceMap,
   getSmartDevicesSnapshot,
@@ -31,34 +32,54 @@ function GroupsRoute() {
       </SmartDevicesPage>
 
       <section className="data-grid" aria-label="Discovered groups">
-        {snapshot.groups.map((group) => (
-          <article className="data-card" key={group.id}>
-            <div className="data-card__header">
-              <div>
-                <p className="data-card__eyebrow">{group.room ?? "Multi-room"}</p>
-                <h3>{group.friendlyName}</h3>
-              </div>
-              <span className="status-pill" data-status={group.state ?? "unknown"}>
-                {group.state ?? "unknown"}
-              </span>
-            </div>
+        {snapshot.groups.map((group) => {
+          const commandIntents = createGroupCommandIntents(group);
 
-            <dl className="data-list">
-              <div>
-                <dt>Topic</dt>
-                <dd>{group.topic}</dd>
+          return (
+            <article className="data-card" key={group.id}>
+              <div className="data-card__header">
+                <div>
+                  <p className="data-card__eyebrow">{group.room ?? "Multi-room"}</p>
+                  <h3>{group.friendlyName}</h3>
+                </div>
+                <span className="status-pill" data-status={group.state ?? "unknown"}>
+                  {group.state ?? "unknown"}
+                </span>
               </div>
-              <div>
-                <dt>Devices</dt>
-                <dd>
-                  {group.deviceIds
-                    .map((deviceId) => devicesById[deviceId]?.friendlyName ?? deviceId)
-                    .join(", ")}
-                </dd>
+
+              <dl className="data-list">
+                <div>
+                  <dt>Topic</dt>
+                  <dd>{group.topic}</dd>
+                </div>
+                <div>
+                  <dt>Devices</dt>
+                  <dd>
+                    {group.deviceIds
+                      .map((deviceId) => devicesById[deviceId]?.friendlyName ?? deviceId)
+                      .join(", ")}
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="command-bar" aria-label={`${group.friendlyName} controls`}>
+                {commandIntents.map((intent) => (
+                  <button
+                    key={intent.id}
+                    type="button"
+                    className="command-button"
+                    disabled={!intent.enabled}
+                    title={`${intent.disabledReason} ${intent.topic} ${JSON.stringify(
+                      intent.payload,
+                    )}`}
+                  >
+                    {intent.payload.state === "on" ? "Turn on" : "Turn off"}
+                  </button>
+                ))}
               </div>
-            </dl>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </section>
     </AppShell>
   );
