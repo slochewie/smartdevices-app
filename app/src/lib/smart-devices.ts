@@ -15,6 +15,24 @@ export type SmartDeviceGroupState = SmartDevicePowerState | "mixed";
 
 export type SmartDeviceControlTarget = "device" | "group";
 
+export type SmartDevicesMqttConnectionStatus =
+  | "not-configured"
+  | "configured"
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
+
+export type SmartDevicesMqttConfig = {
+  organizationSlug: string;
+  brokerUrl: string;
+  zigbee2MqttBaseTopic: string;
+  clientId: string;
+  status: SmartDevicesMqttConnectionStatus;
+  statusMessage: string;
+  lastCheckedAt?: string;
+};
+
 export type SmartDeviceCommandIntent = {
   id: string;
   organizationSlug: string;
