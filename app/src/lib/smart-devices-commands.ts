@@ -12,7 +12,7 @@ type CommandIntentInput = {
   organizationSlug: string;
   targetType: SmartDeviceControlTarget;
   targetId: string;
-  topic: string;
+  zigbee2MqttEntity: string;
   state: SmartDevicePowerState;
 };
 
@@ -20,7 +20,7 @@ function createCommandIntent({
   organizationSlug,
   targetType,
   targetId,
-  topic,
+  zigbee2MqttEntity,
   state,
 }: CommandIntentInput): SmartDeviceCommandIntent {
   return {
@@ -28,7 +28,7 @@ function createCommandIntent({
     organizationSlug,
     targetType,
     targetId,
-    topic,
+    zigbee2MqttEntity,
     command: state === "on" ? "turn-on" : "turn-off",
     payload: { state },
     enabled: false,
@@ -42,14 +42,14 @@ export function createDeviceCommandIntents(device: SmartDevice) {
       organizationSlug: device.organizationSlug,
       targetType: "device",
       targetId: device.id,
-      topic: `${device.topic}/set`,
+      zigbee2MqttEntity: device.zigbee2MqttEntity,
       state: "on",
     }),
     createCommandIntent({
       organizationSlug: device.organizationSlug,
       targetType: "device",
       targetId: device.id,
-      topic: `${device.topic}/set`,
+      zigbee2MqttEntity: device.zigbee2MqttEntity,
       state: "off",
     }),
   ];
@@ -61,14 +61,14 @@ export function createGroupCommandIntents(group: SmartDeviceGroup) {
       organizationSlug: group.organizationSlug,
       targetType: "group",
       targetId: group.id,
-      topic: `${group.topic}/set`,
+      zigbee2MqttEntity: group.zigbee2MqttEntity,
       state: "on",
     }),
     createCommandIntent({
       organizationSlug: group.organizationSlug,
       targetType: "group",
       targetId: group.id,
-      topic: `${group.topic}/set`,
+      zigbee2MqttEntity: group.zigbee2MqttEntity,
       state: "off",
     }),
   ];
