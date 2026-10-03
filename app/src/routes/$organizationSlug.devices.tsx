@@ -9,7 +9,10 @@ import {
   getSmartDevicesMqttConfig,
 } from "#/lib/smart-devices-mqtt-config";
 import { getSmartDevicesSnapshot } from "#/lib/smart-devices-snapshot";
-import { formatMqttPayloadPreview } from "#/lib/zigbee2mqtt-publish";
+import {
+  buildZigbee2MqttTopic,
+  formatMqttPayloadPreview,
+} from "#/lib/zigbee2mqtt-publish";
 
 export const Route = createFileRoute("/$organizationSlug/devices")({
   component: DevicesRoute,
@@ -58,6 +61,8 @@ function DevicesRoute() {
       <section className="data-grid" aria-label="Discovered devices">
         {snapshot.devices.map((device) => {
           const commandIntents = createDeviceCommandIntents(device);
+          const stateTopic = buildZigbee2MqttTopic(mqttConfig, device.zigbee2MqttEntity)
+            .replace(/\/set$/, "");
 
           return (
             <article className="data-card" key={device.id}>
@@ -81,8 +86,12 @@ function DevicesRoute() {
                   <dd>{device.state ?? "unknown"}</dd>
                 </div>
                 <div>
-                  <dt>Topic</dt>
-                  <dd>{device.topic}</dd>
+                  <dt>Zigbee2MQTT entity</dt>
+                  <dd>{device.zigbee2MqttEntity}</dd>
+                </div>
+                <div>
+                  <dt>State topic</dt>
+                  <dd>{stateTopic}</dd>
                 </div>
                 <div>
                   <dt>Capabilities</dt>
@@ -96,7 +105,7 @@ function DevicesRoute() {
 
               <div className="command-bar" aria-label={`${device.friendlyName} controls`}>
                 {commandIntents.map((intent) => {
-                  const result = submitSmartDeviceCommand(intent);
+                  const result = submitSmartDeviceCommand(intent, mqttConfig);
 
                   return (
                     <button
