@@ -4,7 +4,6 @@ import {
   appDefinitionsById,
   buildNavigation,
   getDefaultAppUrls,
-  getDeploymentBrand,
 } from "@niteowl/app-config";
 import { NiteOwlNavigationIcon, useCurrentHostname } from "@niteowl/ui";
 
@@ -19,7 +18,6 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
   const location = useLocation();
   const hostname = useCurrentHostname() ?? "localhost";
   const urls = getDefaultAppUrls(hostname);
-  const brand = getDeploymentBrand(hostname);
   const organizationBasePath = `/${organizationSlug}`;
   const currentOrganizationPath = location.pathname.startsWith(`${organizationBasePath}/`)
     ? location.pathname.slice(organizationBasePath.length)
@@ -44,7 +42,6 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
             <NiteOwlNavigationIcon icon={SMART_DEVICES_APP.icon} />
           </span>
           <span className="app-sidebar__brand-text">
-            <span>{brand}</span>
             <strong>{SMART_DEVICES_APP.label}</strong>
           </span>
         </Link>
@@ -78,7 +75,6 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
       <div className="app-frame">
         <header className="app-header">
           <div>
-            <p className="app-header__eyebrow">{brand}</p>
             <h1>{SMART_DEVICES_APP.label}</h1>
             <p className="app-header__organization">/{organizationSlug}</p>
           </div>
