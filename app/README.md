@@ -1,4 +1,4 @@
-# inventory-app
+# smartdevices-app
 
 A minimal TanStack Start app with one route and plain CSS.
 

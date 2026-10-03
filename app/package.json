@@ -1,5 +1,5 @@
 {
-  "name": "inventory-app",
+  "name": "smartdevices-app",
   "private": true,
   "type": "module",
   "imports": {
