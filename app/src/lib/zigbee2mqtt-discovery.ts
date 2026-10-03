@@ -52,6 +52,9 @@ function detectCapabilities(definition: Zigbee2MqttDeviceDefinition): SmartDevic
   if (properties.has("color_temp") || properties.has("color_temperature")) {
     capabilities.add("color-temperature");
   }
+  if (properties.has("color") || properties.has("color_xy") || properties.has("color_hs")) {
+    capabilities.add("color");
+  }
   if (properties.has("occupancy")) capabilities.add("occupancy");
   if (properties.has("temperature")) capabilities.add("temperature");
 
@@ -66,7 +69,13 @@ function detectKind(
   const description = `${definition.definition.model ?? ""} ${definition.definition.description ?? ""}`.toLowerCase();
 
   if (capabilities.includes("occupancy") || capabilities.includes("temperature")) return "sensor";
-  if (capabilities.includes("brightness") || capabilities.includes("color-temperature")) return "light";
+  if (
+    capabilities.includes("brightness") ||
+    capabilities.includes("color-temperature") ||
+    capabilities.includes("color")
+  ) {
+    return "light";
+  }
   if (entityName.includes("plug") || description.includes("plug")) return "plug";
   return "switch";
 }
