@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
+import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 
 export const Route = createFileRoute("/$organizationSlug/automations")({
   component: AutomationsRoute,
@@ -8,11 +9,12 @@ export const Route = createFileRoute("/$organizationSlug/automations")({
 
 function AutomationsRoute() {
   const { organizationSlug } = Route.useParams();
+  const organization = createSmartDevicesOrganizationContext(organizationSlug);
 
   return (
-    <AppShell organizationSlug={organizationSlug}>
+    <AppShell organization={organization}>
       <SmartDevicesPage
-        organizationSlug={organizationSlug}
+        organization={organization}
         pageId="automations"
         fallbackLabel="Automations"
         fallbackIcon="calendar-days"
