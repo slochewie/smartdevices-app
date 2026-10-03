@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# TanStack / Vite build output
+.output/
+dist/
+.vite/
+.tanstack/
+.vinxi/
+vinxi.config.ts.timestamp-*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Local secrets
+secrets/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing / coverage
+coverage/
+playwright-report/
+test-results/
+
+# TanStack Router generated route tree
+app/src/routeTree.gen.ts
+
+# Local script/output folders
+output/
+
+# Local shared package mounts
+app/packages/
