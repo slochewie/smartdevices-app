@@ -33,6 +33,42 @@ export type SmartDevicesMqttConfig = {
   lastCheckedAt?: string;
 };
 
+export type Zigbee2MqttExposeFeature = {
+  name?: string;
+  property?: string;
+  type?: string;
+  features?: Zigbee2MqttExposeFeature[];
+};
+
+export type Zigbee2MqttDeviceDefinition = {
+  ieee_address?: string;
+  friendly_name: string;
+  definition: {
+    model?: string;
+    vendor?: string;
+    description?: string;
+    exposes?: Zigbee2MqttExposeFeature[];
+  };
+  disabled?: boolean;
+  interview_completed?: boolean;
+};
+
+export type Zigbee2MqttGroupDefinition = {
+  id?: number | string;
+  friendly_name: string;
+  members?: Array<{
+    friendly_name?: string;
+    ieee_address?: string;
+  }>;
+};
+
+export type Zigbee2MqttDeviceState = {
+  availability?: "online" | "offline" | string;
+  state?: "ON" | "OFF" | string;
+  room?: string;
+  lastSeen?: string;
+};
+
 export type SmartDeviceCommandIntent = {
   id: string;
   organizationSlug: string;
