@@ -6,6 +6,7 @@ import {
 } from "@niteowl/app-config";
 import { NiteOwlNavigationIcon } from "@niteowl/ui/navigation";
 import { AppShell } from "#/components/app-shell";
+import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 
 const SMART_DEVICES_APP = appDefinitionsById["smart-devices"];
 
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/$organizationSlug")({
 
 function OrganizationSmartDevicesHome() {
   const { organizationSlug } = Route.useParams();
+  const organization = createSmartDevicesOrganizationContext(organizationSlug);
   const urls = getDefaultAppUrls("localhost");
   const navigation = buildNavigation({
     currentApp: "smart-devices",
@@ -23,14 +25,12 @@ function OrganizationSmartDevicesHome() {
     canAccess: () => true,
   });
   const primaryItems = navigation.primary.flatMap((section) => section.items);
-  const organizationHref = (path: string) =>
-    path === "/" ? `/${organizationSlug}` : `/${organizationSlug}${path}`;
 
   return (
-    <AppShell organizationSlug={organizationSlug}>
+    <AppShell organization={organization}>
       <section className="hero">
         <div>
-          <p className="hero__eyebrow">NiteOwl.dev · /{organizationSlug}</p>
+          <p className="hero__eyebrow">Smart Devices · /{organization.slug}</p>
           <h2>{SMART_DEVICES_APP.label}</h2>
           <p className="hero__description">
             Organization-based dashboards for MQTT-backed lights, switches, plugs,
@@ -42,14 +42,14 @@ function OrganizationSmartDevicesHome() {
           {primaryItems.map((item) => (
             <Link
               key={item.id}
-              to={organizationHref(item.href)}
+              to={organization.pagePath(item.href)}
               className="feature-card"
               data-active={item.active ? "true" : undefined}
             >
               <NiteOwlNavigationIcon icon={item.icon} />
               <span>
                 <strong>{item.label}</strong>
-                <span>{organizationHref(item.href)}</span>
+                <span>{organization.pagePath(item.href)}</span>
               </span>
             </Link>
           ))}
