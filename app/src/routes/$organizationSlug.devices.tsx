@@ -213,7 +213,7 @@ function DevicesRoute() {
             .replace(/\/set$/, "");
 
           return (
-            <article className="data-card" key={device.id}>
+            <article className="data-card data-card--compact" key={device.id}>
               <div className="data-card__header">
                 <div>
                   <p className="data-card__eyebrow">{device.room ?? "Unassigned"}</p>
@@ -224,32 +224,33 @@ function DevicesRoute() {
                 </span>
               </div>
 
-              <dl className="data-list">
-                <div>
-                  <dt>Kind</dt>
-                  <dd>{device.kind}</dd>
-                </div>
-                <div>
-                  <dt>State</dt>
-                  <dd>{device.state ?? "unknown"}</dd>
-                </div>
-                <div>
-                  <dt>Zigbee2MQTT entity</dt>
-                  <dd>{device.zigbee2MqttEntity}</dd>
-                </div>
-                <div>
-                  <dt>State topic</dt>
-                  <dd>{stateTopic}</dd>
-                </div>
-                <div>
-                  <dt>Capabilities</dt>
-                  <dd>{device.capabilities.map(formatCapabilityLabel).join(", ")}</dd>
-                </div>
-                <div>
-                  <dt>Last seen</dt>
-                  <dd>{device.lastSeen ?? "unknown"}</dd>
-                </div>
-              </dl>
+              <div className="device-card__quick">
+                <span>{device.kind}</span>
+                <span>{device.state ?? "unknown"}</span>
+                <span>{device.lastSeen ?? "last seen unknown"}</span>
+              </div>
+
+              <div className="capability-list" aria-label={`${device.friendlyName} capabilities`}>
+                {device.capabilities.map((capability) => (
+                  <span className="capability-chip" key={capability}>
+                    {formatCapabilityLabel(capability)}
+                  </span>
+                ))}
+              </div>
+
+              <details className="mqtt-details">
+                <summary>MQTT details</summary>
+                <dl className="data-list">
+                  <div>
+                    <dt>Zigbee2MQTT entity</dt>
+                    <dd>{device.zigbee2MqttEntity}</dd>
+                  </div>
+                  <div>
+                    <dt>State topic</dt>
+                    <dd>{stateTopic}</dd>
+                  </div>
+                </dl>
+              </details>
 
               <div className="command-bar" aria-label={`${device.friendlyName} controls`}>
                 {commandIntents.map((intent) => {
