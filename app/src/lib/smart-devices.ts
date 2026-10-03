@@ -181,6 +181,25 @@ export type SmartDeviceGroup = {
   state?: SmartDeviceGroupState;
 };
 
+export type SmartDeviceSceneAction = {
+  id: string;
+  targetType: SmartDeviceControlTarget;
+  targetId: string;
+  targetName: string;
+  zigbee2MqttEntity: string;
+  state: SmartDevicePowerState;
+};
+
+export type SmartDeviceScene = {
+  id: string;
+  organizationSlug: string;
+  name: string;
+  description: string;
+  room?: string;
+  enabled: boolean;
+  actions: SmartDeviceSceneAction[];
+};
+
 export type SmartDevicesSnapshot = {
   organizationSlug: string;
   source: "mock" | "mqtt";
