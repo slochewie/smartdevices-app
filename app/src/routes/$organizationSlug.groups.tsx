@@ -12,7 +12,10 @@ import {
   getSmartDeviceMap,
   getSmartDevicesSnapshot,
 } from "#/lib/smart-devices-snapshot";
-import { formatMqttPayloadPreview } from "#/lib/zigbee2mqtt-publish";
+import {
+  buildZigbee2MqttTopic,
+  formatMqttPayloadPreview,
+} from "#/lib/zigbee2mqtt-publish";
 
 export const Route = createFileRoute("/$organizationSlug/groups")({
   component: GroupsRoute,
@@ -63,6 +66,8 @@ function GroupsRoute() {
       <section className="data-grid" aria-label="Discovered groups">
         {snapshot.groups.map((group) => {
           const commandIntents = createGroupCommandIntents(group);
+          const stateTopic = buildZigbee2MqttTopic(mqttConfig, group.zigbee2MqttEntity)
+            .replace(/\/set$/, "");
 
           return (
             <article className="data-card" key={group.id}>
@@ -78,8 +83,12 @@ function GroupsRoute() {
 
               <dl className="data-list">
                 <div>
-                  <dt>Topic</dt>
-                  <dd>{group.topic}</dd>
+                  <dt>Zigbee2MQTT entity</dt>
+                  <dd>{group.zigbee2MqttEntity}</dd>
+                </div>
+                <div>
+                  <dt>State topic</dt>
+                  <dd>{stateTopic}</dd>
                 </div>
                 <div>
                   <dt>Devices</dt>
@@ -93,7 +102,7 @@ function GroupsRoute() {
 
               <div className="command-bar" aria-label={`${group.friendlyName} controls`}>
                 {commandIntents.map((intent) => {
-                  const result = submitSmartDeviceCommand(intent);
+                  const result = submitSmartDeviceCommand(intent, mqttConfig);
 
                   return (
                     <button
