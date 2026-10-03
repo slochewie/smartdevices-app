@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { appDefinitionsById } from "@niteowl/app-config";
 import { NiteOwlNavigationIcon } from "@niteowl/ui/navigation";
+import type { SmartDevicesOrganizationContext } from "#/lib/organization-context";
 
 const SMART_DEVICES_APP = appDefinitionsById["smart-devices"];
 
 type SmartDevicesPageProps = {
-  organizationSlug: string;
+  organization: SmartDevicesOrganizationContext;
   pageId: string;
   fallbackLabel: string;
   fallbackIcon: string;
@@ -13,7 +14,7 @@ type SmartDevicesPageProps = {
 };
 
 export function SmartDevicesPage({
-  organizationSlug,
+  organization,
   pageId,
   fallbackLabel,
   fallbackIcon,
@@ -29,7 +30,7 @@ export function SmartDevicesPage({
         <NiteOwlNavigationIcon icon={icon} />
       </div>
       <div>
-        <p className="page-card__eyebrow">Smart Devices · /{organizationSlug}</p>
+        <p className="page-card__eyebrow">Smart Devices · /{organization.slug}</p>
         <h2>{label}</h2>
         <p className="page-card__description">{children}</p>
       </div>
