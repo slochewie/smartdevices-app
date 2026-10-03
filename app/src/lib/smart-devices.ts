@@ -29,6 +29,18 @@ export type SmartDeviceCommandIntent = {
   disabledReason?: string;
 };
 
+export type SmartDeviceMqttPublishRequest = {
+  organizationSlug: string;
+  targetType: SmartDeviceControlTarget;
+  targetId: string;
+  topic: string;
+  payload: {
+    state: "ON" | "OFF";
+  };
+  qos: 0 | 1 | 2;
+  retain: boolean;
+};
+
 export type SmartDevice = {
   id: string;
   organizationSlug: string;
