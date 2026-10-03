@@ -7,6 +7,10 @@ import {
 } from "@niteowl/app-config";
 import { NiteOwlNavigationIcon, useCurrentHostname } from "@niteowl/ui";
 import type { SmartDevicesOrganizationContext } from "#/lib/organization-context";
+import {
+  getMqttConnectionLabel,
+  getSmartDevicesMqttConfig,
+} from "#/lib/smart-devices-mqtt-config";
 
 const SMART_DEVICES_APP = appDefinitionsById["smart-devices"];
 
@@ -19,6 +23,7 @@ export function AppShell({ organization, children }: AppShellProps) {
   const location = useLocation();
   const hostname = useCurrentHostname() ?? "localhost";
   const urls = getDefaultAppUrls(hostname);
+  const mqttConfig = getSmartDevicesMqttConfig(organization.slug);
   const currentOrganizationPath = location.pathname.startsWith(`${organization.basePath}/`)
     ? location.pathname.slice(organization.basePath.length)
     : "/";
@@ -76,7 +81,12 @@ export function AppShell({ organization, children }: AppShellProps) {
             <h1>{SMART_DEVICES_APP.label}</h1>
             <p className="app-header__organization">/{organization.slug}</p>
           </div>
-          <span className="app-header__status">Auth pending</span>
+          <div className="app-header__status-group" aria-label="Connection status">
+            <span className="app-header__status" data-status={mqttConfig.status}>
+              {getMqttConnectionLabel(mqttConfig)}
+            </span>
+            <span className="app-header__status">Auth pending</span>
+          </div>
         </header>
 
         <main className="app-main">{children}</main>
