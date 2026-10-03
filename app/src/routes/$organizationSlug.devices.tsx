@@ -4,6 +4,10 @@ import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 import { submitSmartDeviceCommand } from "#/lib/smart-devices-command-execution";
 import { createDeviceCommandIntents } from "#/lib/smart-devices-commands";
+import {
+  getMqttConnectionLabel,
+  getSmartDevicesMqttConfig,
+} from "#/lib/smart-devices-mqtt-config";
 import { getSmartDevicesSnapshot } from "#/lib/smart-devices-snapshot";
 import { formatMqttPayloadPreview } from "#/lib/zigbee2mqtt-publish";
 
@@ -15,6 +19,7 @@ function DevicesRoute() {
   const { organizationSlug } = Route.useParams();
   const organization = createSmartDevicesOrganizationContext(organizationSlug);
   const snapshot = getSmartDevicesSnapshot(organization.slug);
+  const mqttConfig = getSmartDevicesMqttConfig(organization.slug);
 
   return (
     <AppShell organization={organization}>
@@ -27,6 +32,28 @@ function DevicesRoute() {
         Smart Devices snapshot data scoped to this organization. The current
         provider is mock-backed and can be swapped for live MQTT discovery later.
       </SmartDevicesPage>
+
+      <section className="config-card" aria-label="MQTT configuration">
+        <div>
+          <p className="config-card__eyebrow">MQTT config</p>
+          <h3>{getMqttConnectionLabel(mqttConfig)}</h3>
+          <p>{mqttConfig.statusMessage}</p>
+        </div>
+        <dl className="config-list">
+          <div>
+            <dt>Broker</dt>
+            <dd>{mqttConfig.brokerUrl || "not configured"}</dd>
+          </div>
+          <div>
+            <dt>Base topic</dt>
+            <dd>{mqttConfig.zigbee2MqttBaseTopic}</dd>
+          </div>
+          <div>
+            <dt>Client ID</dt>
+            <dd>{mqttConfig.clientId}</dd>
+          </div>
+        </dl>
+      </section>
 
       <section className="data-grid" aria-label="Discovered devices">
         {snapshot.devices.map((device) => {
