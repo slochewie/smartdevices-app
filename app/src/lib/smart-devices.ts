@@ -61,6 +61,23 @@ export type SmartDevicesRetainedMqttReadResult = {
   snapshot: SmartDevicesRetainedMqttSnapshot;
 };
 
+export type SmartDevicesMqttPublishStatus =
+  | "dry-run"
+  | "not-configured"
+  | "not-wired"
+  | "queued"
+  | "sent"
+  | "failed";
+
+export type SmartDevicesMqttPublishResult = {
+  id: string;
+  organizationSlug: string;
+  status: SmartDevicesMqttPublishStatus;
+  message: string;
+  request: SmartDeviceMqttPublishRequest;
+  publishedAt: string;
+};
+
 export type Zigbee2MqttExposeFeature = {
   name?: string;
   property?: string;
@@ -135,6 +152,7 @@ export type SmartDeviceCommandExecutionResult = {
   organizationSlug: string;
   intent: SmartDeviceCommandIntent;
   publishRequest: SmartDeviceMqttPublishRequest;
+  publishResult: SmartDevicesMqttPublishResult;
   status: SmartDeviceCommandExecutionStatus;
   message: string;
 };
