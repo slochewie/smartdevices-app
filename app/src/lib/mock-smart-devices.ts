@@ -78,9 +78,3 @@ export function getMockSmartDevices(organizationSlug: string) {
 export function getMockSmartDeviceGroups(organizationSlug: string) {
   return mockGroups.filter((group) => group.organizationSlug === organizationSlug);
 }
-
-export function getMockSmartDeviceMap(organizationSlug: string) {
-  return Object.fromEntries(
-    getMockSmartDevices(organizationSlug).map((device) => [device.id, device]),
-  );
-}
