@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
-import { getMockSmartDevices } from "#/lib/mock-smart-devices";
+import { getSmartDevicesSnapshot } from "#/lib/smart-devices-snapshot";
 
 export const Route = createFileRoute("/$organizationSlug/devices")({
   component: DevicesRoute,
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/$organizationSlug/devices")({
 function DevicesRoute() {
   const { organizationSlug } = Route.useParams();
   const organization = createSmartDevicesOrganizationContext(organizationSlug);
-  const devices = getMockSmartDevices(organization.slug);
+  const snapshot = getSmartDevicesSnapshot(organization.slug);
 
   return (
     <AppShell organization={organization}>
@@ -21,12 +21,12 @@ function DevicesRoute() {
         fallbackLabel="Devices"
         fallbackIcon="plug-zap"
       >
-        Mock Zigbee2MQTT discovery data scoped to this organization. Live MQTT
-        discovery will replace this data source later.
+        Smart Devices snapshot data scoped to this organization. The current
+        provider is mock-backed and can be swapped for live MQTT discovery later.
       </SmartDevicesPage>
 
       <section className="data-grid" aria-label="Discovered devices">
-        {devices.map((device) => (
+        {snapshot.devices.map((device) => (
           <article className="data-card" key={device.id}>
             <div className="data-card__header">
               <div>
