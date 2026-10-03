@@ -6,6 +6,7 @@ export type SmartDeviceCapability =
   | "power"
   | "brightness"
   | "color-temperature"
+  | "color"
   | "occupancy"
   | "temperature";
 
