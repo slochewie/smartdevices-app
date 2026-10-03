@@ -47,6 +47,20 @@ export type SmartDevicesRetainedMqttSnapshot = {
   capturedAt: string;
 };
 
+export type SmartDevicesRetainedMqttReadStatus =
+  | "mock"
+  | "not-configured"
+  | "not-wired"
+  | "connected"
+  | "failed";
+
+export type SmartDevicesRetainedMqttReadResult = {
+  organizationSlug: string;
+  status: SmartDevicesRetainedMqttReadStatus;
+  message: string;
+  snapshot: SmartDevicesRetainedMqttSnapshot;
+};
+
 export type Zigbee2MqttExposeFeature = {
   name?: string;
   property?: string;
