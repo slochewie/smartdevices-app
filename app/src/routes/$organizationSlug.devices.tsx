@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
+import { createDeviceCommandIntents } from "#/lib/smart-devices-commands";
 import { getSmartDevicesSnapshot } from "#/lib/smart-devices-snapshot";
 
 export const Route = createFileRoute("/$organizationSlug/devices")({
@@ -26,42 +27,62 @@ function DevicesRoute() {
       </SmartDevicesPage>
 
       <section className="data-grid" aria-label="Discovered devices">
-        {snapshot.devices.map((device) => (
-          <article className="data-card" key={device.id}>
-            <div className="data-card__header">
-              <div>
-                <p className="data-card__eyebrow">{device.room ?? "Unassigned"}</p>
-                <h3>{device.friendlyName}</h3>
-              </div>
-              <span className="status-pill" data-status={device.availability}>
-                {device.availability}
-              </span>
-            </div>
+        {snapshot.devices.map((device) => {
+          const commandIntents = createDeviceCommandIntents(device);
 
-            <dl className="data-list">
-              <div>
-                <dt>Kind</dt>
-                <dd>{device.kind}</dd>
+          return (
+            <article className="data-card" key={device.id}>
+              <div className="data-card__header">
+                <div>
+                  <p className="data-card__eyebrow">{device.room ?? "Unassigned"}</p>
+                  <h3>{device.friendlyName}</h3>
+                </div>
+                <span className="status-pill" data-status={device.availability}>
+                  {device.availability}
+                </span>
               </div>
-              <div>
-                <dt>State</dt>
-                <dd>{device.state ?? "unknown"}</dd>
+
+              <dl className="data-list">
+                <div>
+                  <dt>Kind</dt>
+                  <dd>{device.kind}</dd>
+                </div>
+                <div>
+                  <dt>State</dt>
+                  <dd>{device.state ?? "unknown"}</dd>
+                </div>
+                <div>
+                  <dt>Topic</dt>
+                  <dd>{device.topic}</dd>
+                </div>
+                <div>
+                  <dt>Capabilities</dt>
+                  <dd>{device.capabilities.join(", ")}</dd>
+                </div>
+                <div>
+                  <dt>Last seen</dt>
+                  <dd>{device.lastSeen ?? "unknown"}</dd>
+                </div>
+              </dl>
+
+              <div className="command-bar" aria-label={`${device.friendlyName} controls`}>
+                {commandIntents.map((intent) => (
+                  <button
+                    key={intent.id}
+                    type="button"
+                    className="command-button"
+                    disabled={!intent.enabled}
+                    title={`${intent.disabledReason} ${intent.topic} ${JSON.stringify(
+                      intent.payload,
+                    )}`}
+                  >
+                    {intent.payload.state === "on" ? "Turn on" : "Turn off"}
+                  </button>
+                ))}
               </div>
-              <div>
-                <dt>Topic</dt>
-                <dd>{device.topic}</dd>
-              </div>
-              <div>
-                <dt>Capabilities</dt>
-                <dd>{device.capabilities.join(", ")}</dd>
-              </div>
-              <div>
-                <dt>Last seen</dt>
-                <dd>{device.lastSeen ?? "unknown"}</dd>
-              </div>
-            </dl>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </section>
     </AppShell>
   );
