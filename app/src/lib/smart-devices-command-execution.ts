@@ -1,6 +1,7 @@
 import type {
   SmartDeviceCommandExecutionResult,
   SmartDeviceCommandIntent,
+  SmartDevicesMqttConfig,
 } from "./smart-devices";
 import { createZigbee2MqttPublishRequest } from "./zigbee2mqtt-publish";
 
@@ -8,8 +9,9 @@ const MQTT_NOT_WIRED_MESSAGE = "MQTT publisher is not wired yet.";
 
 export function submitSmartDeviceCommand(
   intent: SmartDeviceCommandIntent,
+  mqttConfig: SmartDevicesMqttConfig,
 ): SmartDeviceCommandExecutionResult {
-  const publishRequest = createZigbee2MqttPublishRequest(intent);
+  const publishRequest = createZigbee2MqttPublishRequest(intent, mqttConfig);
 
   return {
     id: `dry-run:${intent.id}`,
