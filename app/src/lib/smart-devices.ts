@@ -9,6 +9,26 @@ export type SmartDeviceCapability =
   | "occupancy"
   | "temperature";
 
+export type SmartDevicePowerState = "on" | "off";
+
+export type SmartDeviceGroupState = SmartDevicePowerState | "mixed";
+
+export type SmartDeviceControlTarget = "device" | "group";
+
+export type SmartDeviceCommandIntent = {
+  id: string;
+  organizationSlug: string;
+  targetType: SmartDeviceControlTarget;
+  targetId: string;
+  topic: string;
+  command: "turn-on" | "turn-off";
+  payload: {
+    state: SmartDevicePowerState;
+  };
+  enabled: boolean;
+  disabledReason?: string;
+};
+
 export type SmartDevice = {
   id: string;
   organizationSlug: string;
@@ -17,7 +37,7 @@ export type SmartDevice = {
   topic: string;
   availability: SmartDeviceAvailability;
   room?: string;
-  state?: "on" | "off";
+  state?: SmartDevicePowerState;
   capabilities: SmartDeviceCapability[];
   lastSeen?: string;
 };
@@ -29,7 +49,7 @@ export type SmartDeviceGroup = {
   topic: string;
   deviceIds: string[];
   room?: string;
-  state?: "on" | "off" | "mixed";
+  state?: SmartDeviceGroupState;
 };
 
 export type SmartDevicesSnapshot = {
