@@ -76,6 +76,11 @@ function buildGroupsHref({
   return `/${organizationSlug}/groups${query ? `?${query}` : ""}`;
 }
 
+function formatGroupState(state?: SmartDeviceGroupState) {
+  if (!state) return "Unknown";
+  return `${state.charAt(0).toUpperCase()}${state.slice(1)}`;
+}
+
 function GroupsRoute() {
   const { organizationSlug } = Route.useParams();
   const search = Route.useSearch();
@@ -232,8 +237,7 @@ function GroupsRoute() {
               </div>
 
               <div className="device-card__quick">
-                <span>Group</span>
-                <span>{group.state ?? "unknown"}</span>
+                <span>{formatGroupState(group.state)}</span>
                 <span>{deviceNames.length} devices</span>
               </div>
 
