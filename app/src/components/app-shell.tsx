@@ -6,21 +6,21 @@ import {
   getDefaultAppUrls,
 } from "@niteowl/app-config";
 import { NiteOwlNavigationIcon, useCurrentHostname } from "@niteowl/ui";
+import type { SmartDevicesOrganizationContext } from "#/lib/organization-context";
 
 const SMART_DEVICES_APP = appDefinitionsById["smart-devices"];
 
 type AppShellProps = {
-  organizationSlug: string;
+  organization: SmartDevicesOrganizationContext;
   children: ReactNode;
 };
 
-export function AppShell({ organizationSlug, children }: AppShellProps) {
+export function AppShell({ organization, children }: AppShellProps) {
   const location = useLocation();
   const hostname = useCurrentHostname() ?? "localhost";
   const urls = getDefaultAppUrls(hostname);
-  const organizationBasePath = `/${organizationSlug}`;
-  const currentOrganizationPath = location.pathname.startsWith(`${organizationBasePath}/`)
-    ? location.pathname.slice(organizationBasePath.length)
+  const currentOrganizationPath = location.pathname.startsWith(`${organization.basePath}/`)
+    ? location.pathname.slice(organization.basePath.length)
     : "/";
   const navigation = buildNavigation({
     currentApp: "smart-devices",
@@ -31,13 +31,11 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
 
   const primaryItems = navigation.primary.flatMap((section) => section.items);
   const appItems = navigation.apps.flatMap((section) => section.items);
-  const organizationHref = (path: string) =>
-    path === "/" ? organizationBasePath : `${organizationBasePath}${path}`;
 
   return (
     <div className="app-shell">
       <aside className="app-sidebar" aria-label="Smart Devices navigation">
-        <Link to={organizationBasePath} className="app-sidebar__brand">
+        <Link to={organization.basePath} className="app-sidebar__brand">
           <span className="app-sidebar__brand-icon" aria-hidden="true">
             <NiteOwlNavigationIcon icon={SMART_DEVICES_APP.icon} />
           </span>
@@ -51,7 +49,7 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
           {primaryItems.map((item) => (
             <Link
               key={item.id}
-              to={organizationHref(item.href)}
+              to={organization.pagePath(item.href)}
               className="app-nav__item"
               data-active={item.active ? "true" : undefined}
             >
@@ -76,7 +74,7 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
         <header className="app-header">
           <div>
             <h1>{SMART_DEVICES_APP.label}</h1>
-            <p className="app-header__organization">/{organizationSlug}</p>
+            <p className="app-header__organization">/{organization.slug}</p>
           </div>
           <span className="app-header__status">Auth pending</span>
         </header>
