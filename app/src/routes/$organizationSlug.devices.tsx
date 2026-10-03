@@ -21,6 +21,63 @@ type DevicesSearch = {
 
 const DEVICE_KIND_ORDER: SmartDeviceKind[] = ["light", "plug", "switch", "sensor"];
 
+const COMPACT_DEVICE_CARD_STYLE = `
+.data-card--compact {
+  align-content: start;
+  gap: 0.85rem;
+}
+
+.device-card__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.device-card__quick span,
+.capability-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid #3f3f46;
+  border-radius: 999px;
+  color: #d4d4d8;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.76rem;
+  text-transform: capitalize;
+}
+
+.capability-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.capability-chip {
+  border-color: rgba(59, 130, 246, 0.42);
+  background: rgba(59, 130, 246, 0.08);
+  color: #bfdbfe;
+}
+
+.mqtt-details {
+  border-top: 1px solid #27272a;
+  padding-top: 0.75rem;
+}
+
+.mqtt-details summary {
+  cursor: pointer;
+  color: #a1a1aa;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mqtt-details[open] summary {
+  margin-bottom: 0.75rem;
+  color: #e4e4e7;
+}
+`;
+
 export const Route = createFileRoute("/$organizationSlug/devices")({
   validateSearch: (search: Record<string, unknown>): DevicesSearch => ({
     room: typeof search.room === "string" && search.room ? search.room : undefined,
@@ -99,6 +156,8 @@ function DevicesRoute() {
 
   return (
     <>
+      <style>{COMPACT_DEVICE_CARD_STYLE}</style>
+
       <SmartDevicesPage
         organization={organization}
         pageId="devices"
