@@ -3,7 +3,11 @@ import type {
   Zigbee2MqttDeviceState,
   Zigbee2MqttGroupDefinition,
 } from "./smart-devices";
-import { parseZigbee2MqttDiscovery } from "./zigbee2mqtt-discovery";
+import { parseZigbee2MqttRetainedSnapshot } from "./zigbee2mqtt-discovery";
+import { createZigbee2MqttRetainedSnapshot } from "./zigbee2mqtt-retained-messages";
+
+const MOCK_BASE_TOPIC = "zigbee2mqtt";
+const MOCK_ORGANIZATION_SLUG = "mccarthys-irish-pub";
 
 const mockDeviceDefinitions: Zigbee2MqttDeviceDefinition[] = [
   {
@@ -110,13 +114,18 @@ const mockEntityStates: Record<string, Zigbee2MqttDeviceState> = {
   },
 };
 
-function getMockDiscovery(organizationSlug: string) {
-  return parseZigbee2MqttDiscovery({
+export function getMockRetainedMqttSnapshot(organizationSlug: string) {
+  return createZigbee2MqttRetainedSnapshot({
     organizationSlug,
-    devices: organizationSlug === "mccarthys-irish-pub" ? mockDeviceDefinitions : [],
-    groups: organizationSlug === "mccarthys-irish-pub" ? mockGroupDefinitions : [],
-    states: organizationSlug === "mccarthys-irish-pub" ? mockEntityStates : {},
+    baseTopic: MOCK_BASE_TOPIC,
+    devices: organizationSlug === MOCK_ORGANIZATION_SLUG ? mockDeviceDefinitions : [],
+    groups: organizationSlug === MOCK_ORGANIZATION_SLUG ? mockGroupDefinitions : [],
+    states: organizationSlug === MOCK_ORGANIZATION_SLUG ? mockEntityStates : {},
   });
+}
+
+function getMockDiscovery(organizationSlug: string) {
+  return parseZigbee2MqttRetainedSnapshot(getMockRetainedMqttSnapshot(organizationSlug));
 }
 
 export function getMockSmartDevices(organizationSlug: string) {
