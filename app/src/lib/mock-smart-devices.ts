@@ -1,80 +1,128 @@
-import type { SmartDevice, SmartDeviceGroup } from "./smart-devices";
+import type {
+  Zigbee2MqttDeviceDefinition,
+  Zigbee2MqttDeviceState,
+  Zigbee2MqttGroupDefinition,
+} from "./smart-devices";
+import { parseZigbee2MqttDiscovery } from "./zigbee2mqtt-discovery";
 
-const mockDevices: SmartDevice[] = [
+const mockDeviceDefinitions: Zigbee2MqttDeviceDefinition[] = [
   {
-    id: "bar-pendants",
-    organizationSlug: "mccarthys-irish-pub",
-    friendlyName: "Bar Pendants",
-    kind: "light",
-    zigbee2MqttEntity: "bar_pendants",
+    ieee_address: "0x0017880100010001",
+    friendly_name: "bar_pendants",
+    definition: {
+      vendor: "Philips",
+      model: "dimmable-light",
+      description: "Bar pendant bulbs",
+      exposes: [
+        { type: "binary", name: "state", property: "state" },
+        { type: "numeric", name: "brightness", property: "brightness" },
+        { type: "numeric", name: "color_temp", property: "color_temp" },
+      ],
+    },
+    interview_completed: true,
+  },
+  {
+    ieee_address: "0x0017880100010002",
+    friendly_name: "backbar_leds",
+    definition: {
+      vendor: "Gledopto",
+      model: "led-controller",
+      description: "Backbar LED controller",
+      exposes: [
+        { type: "binary", name: "state", property: "state" },
+        { type: "numeric", name: "brightness", property: "brightness" },
+      ],
+    },
+    interview_completed: true,
+  },
+  {
+    ieee_address: "0x00158d0000010003",
+    friendly_name: "patio_string_lights",
+    definition: {
+      vendor: "SONOFF",
+      model: "switch",
+      description: "Outdoor relay switch",
+      exposes: [{ type: "binary", name: "state", property: "state" }],
+    },
+    interview_completed: true,
+  },
+  {
+    ieee_address: "0x00124b0024010004",
+    friendly_name: "christmas_tree_plug",
+    definition: {
+      vendor: "Third Reality",
+      model: "smart-plug",
+      description: "Smart plug",
+      exposes: [{ type: "binary", name: "state", property: "state" }],
+    },
+    interview_completed: true,
+  },
+];
+
+const mockGroupDefinitions: Zigbee2MqttGroupDefinition[] = [
+  {
+    id: 1,
+    friendly_name: "bar_lights",
+    members: [
+      { friendly_name: "bar_pendants", ieee_address: "0x0017880100010001" },
+      { friendly_name: "backbar_leds", ieee_address: "0x0017880100010002" },
+    ],
+  },
+  {
+    id: 2,
+    friendly_name: "open_lights",
+    members: [
+      { friendly_name: "bar_pendants", ieee_address: "0x0017880100010001" },
+      { friendly_name: "backbar_leds", ieee_address: "0x0017880100010002" },
+      { friendly_name: "patio_string_lights", ieee_address: "0x00158d0000010003" },
+    ],
+  },
+];
+
+const mockEntityStates: Record<string, Zigbee2MqttDeviceState> = {
+  bar_pendants: {
     availability: "online",
+    state: "ON",
     room: "Bar",
-    state: "on",
-    capabilities: ["power", "brightness", "color-temperature"],
     lastSeen: "2 minutes ago",
   },
-  {
-    id: "backbar-leds",
-    organizationSlug: "mccarthys-irish-pub",
-    friendlyName: "Backbar LEDs",
-    kind: "light",
-    zigbee2MqttEntity: "backbar_leds",
+  backbar_leds: {
     availability: "online",
+    state: "ON",
     room: "Bar",
-    state: "on",
-    capabilities: ["power", "brightness"],
     lastSeen: "1 minute ago",
   },
-  {
-    id: "patio-string-lights",
-    organizationSlug: "mccarthys-irish-pub",
-    friendlyName: "Patio String Lights",
-    kind: "switch",
-    zigbee2MqttEntity: "patio_string_lights",
+  patio_string_lights: {
     availability: "offline",
+    state: "OFF",
     room: "Patio",
-    state: "off",
-    capabilities: ["power"],
     lastSeen: "47 minutes ago",
   },
-  {
-    id: "christmas-tree-plug",
-    organizationSlug: "mccarthys-irish-pub",
-    friendlyName: "Christmas Tree Plug",
-    kind: "plug",
-    zigbee2MqttEntity: "christmas_tree_plug",
+  christmas_tree_plug: {
     availability: "online",
+    state: "OFF",
     room: "Dining Room",
-    state: "off",
-    capabilities: ["power"],
     lastSeen: "5 minutes ago",
   },
-];
-
-const mockGroups: SmartDeviceGroup[] = [
-  {
-    id: "bar-lights",
-    organizationSlug: "mccarthys-irish-pub",
-    friendlyName: "Bar Lights",
-    zigbee2MqttEntity: "bar_lights",
-    deviceIds: ["bar-pendants", "backbar-leds"],
+  bar_lights: {
+    state: "ON",
     room: "Bar",
-    state: "on",
   },
-  {
-    id: "open-lights",
-    organizationSlug: "mccarthys-irish-pub",
-    friendlyName: "Open Lights",
-    zigbee2MqttEntity: "open_lights",
-    deviceIds: ["bar-pendants", "backbar-leds", "patio-string-lights"],
-    state: "mixed",
-  },
-];
+};
+
+function getMockDiscovery(organizationSlug: string) {
+  return parseZigbee2MqttDiscovery({
+    organizationSlug,
+    devices: organizationSlug === "mccarthys-irish-pub" ? mockDeviceDefinitions : [],
+    groups: organizationSlug === "mccarthys-irish-pub" ? mockGroupDefinitions : [],
+    states: organizationSlug === "mccarthys-irish-pub" ? mockEntityStates : {},
+  });
+}
 
 export function getMockSmartDevices(organizationSlug: string) {
-  return mockDevices.filter((device) => device.organizationSlug === organizationSlug);
+  return getMockDiscovery(organizationSlug).devices;
 }
 
 export function getMockSmartDeviceGroups(organizationSlug: string) {
-  return mockGroups.filter((group) => group.organizationSlug === organizationSlug);
+  return getMockDiscovery(organizationSlug).groups;
 }
