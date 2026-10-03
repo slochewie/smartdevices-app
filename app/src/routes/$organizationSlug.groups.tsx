@@ -5,6 +5,10 @@ import { createSmartDevicesOrganizationContext } from "#/lib/organization-contex
 import { submitSmartDeviceCommand } from "#/lib/smart-devices-command-execution";
 import { createGroupCommandIntents } from "#/lib/smart-devices-commands";
 import {
+  getMqttConnectionLabel,
+  getSmartDevicesMqttConfig,
+} from "#/lib/smart-devices-mqtt-config";
+import {
   getSmartDeviceMap,
   getSmartDevicesSnapshot,
 } from "#/lib/smart-devices-snapshot";
@@ -19,6 +23,7 @@ function GroupsRoute() {
   const organization = createSmartDevicesOrganizationContext(organizationSlug);
   const snapshot = getSmartDevicesSnapshot(organization.slug);
   const devicesById = getSmartDeviceMap(snapshot);
+  const mqttConfig = getSmartDevicesMqttConfig(organization.slug);
 
   return (
     <AppShell organization={organization}>
@@ -32,6 +37,28 @@ function GroupsRoute() {
         current provider is mock-backed and can be swapped for live MQTT
         discovery later.
       </SmartDevicesPage>
+
+      <section className="config-card" aria-label="MQTT configuration">
+        <div>
+          <p className="config-card__eyebrow">MQTT config</p>
+          <h3>{getMqttConnectionLabel(mqttConfig)}</h3>
+          <p>{mqttConfig.statusMessage}</p>
+        </div>
+        <dl className="config-list">
+          <div>
+            <dt>Broker</dt>
+            <dd>{mqttConfig.brokerUrl || "not configured"}</dd>
+          </div>
+          <div>
+            <dt>Base topic</dt>
+            <dd>{mqttConfig.zigbee2MqttBaseTopic}</dd>
+          </div>
+          <div>
+            <dt>Client ID</dt>
+            <dd>{mqttConfig.clientId}</dd>
+          </div>
+        </dl>
+      </section>
 
       <section className="data-grid" aria-label="Discovered groups">
         {snapshot.groups.map((group) => {
