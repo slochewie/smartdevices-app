@@ -5,10 +5,12 @@ import type {
   SmartDeviceGroup,
   SmartDeviceKind,
   SmartDevicePowerState,
+  SmartDevicesRetainedMqttSnapshot,
   Zigbee2MqttDeviceDefinition,
   Zigbee2MqttDeviceState,
   Zigbee2MqttGroupDefinition,
 } from "./smart-devices";
+import { readZigbee2MqttRetainedDiscovery } from "./zigbee2mqtt-retained-messages";
 
 function toStableId(value: string) {
   return value
@@ -164,4 +166,17 @@ export function parseZigbee2MqttDiscovery({
       }),
     ),
   };
+}
+
+export function parseZigbee2MqttRetainedSnapshot(
+  snapshot: SmartDevicesRetainedMqttSnapshot,
+) {
+  const discovery = readZigbee2MqttRetainedDiscovery(snapshot);
+
+  return parseZigbee2MqttDiscovery({
+    organizationSlug: snapshot.organizationSlug,
+    devices: discovery.devices,
+    groups: discovery.groups,
+    states: discovery.states,
+  });
 }
