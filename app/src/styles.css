@@ -423,22 +423,29 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  border-top: 1px solid #27272a;
-  padding-top: 1rem;
 }
 
 .command-button {
+  display: inline-grid;
+  gap: 0.2rem;
+  justify-items: start;
   border: 1px solid #3f3f46;
-  border-radius: 0.75rem;
+  border-radius: 0.7rem;
   background: #18181b;
   color: #fafafa;
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.7rem;
   font-weight: 700;
 }
 
 .command-button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
+}
+
+.command-button code {
+  color: #a1a1aa;
+  font-size: 0.72rem;
+  font-weight: 500;
 }
 
 @media (max-width: 800px) {
