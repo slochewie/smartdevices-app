@@ -2,15 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
+import { submitSmartDeviceCommand } from "#/lib/smart-devices-command-execution";
 import { createGroupCommandIntents } from "#/lib/smart-devices-commands";
 import {
   getSmartDeviceMap,
   getSmartDevicesSnapshot,
 } from "#/lib/smart-devices-snapshot";
-import {
-  createZigbee2MqttPublishRequest,
-  formatMqttPayloadPreview,
-} from "#/lib/zigbee2mqtt-publish";
+import { formatMqttPayloadPreview } from "#/lib/zigbee2mqtt-publish";
 
 export const Route = createFileRoute("/$organizationSlug/groups")({
   component: GroupsRoute,
@@ -68,7 +66,7 @@ function GroupsRoute() {
 
               <div className="command-bar" aria-label={`${group.friendlyName} controls`}>
                 {commandIntents.map((intent) => {
-                  const publishRequest = createZigbee2MqttPublishRequest(intent);
+                  const result = submitSmartDeviceCommand(intent);
 
                   return (
                     <button
@@ -76,12 +74,13 @@ function GroupsRoute() {
                       type="button"
                       className="command-button"
                       disabled={!intent.enabled}
-                      title={`${intent.disabledReason} ${publishRequest.topic} ${formatMqttPayloadPreview(
-                        publishRequest,
+                      title={`${result.message} ${result.publishRequest.topic} ${formatMqttPayloadPreview(
+                        result.publishRequest,
                       )}`}
                     >
                       <span>{intent.payload.state === "on" ? "Turn on" : "Turn off"}</span>
-                      <code>{formatMqttPayloadPreview(publishRequest)}</code>
+                      <code>{formatMqttPayloadPreview(result.publishRequest)}</code>
+                      <small>{result.status}</small>
                     </button>
                   );
                 })}
