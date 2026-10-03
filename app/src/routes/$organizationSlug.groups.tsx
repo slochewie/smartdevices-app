@@ -3,9 +3,9 @@ import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 import {
-  getMockSmartDeviceGroups,
-  getMockSmartDeviceMap,
-} from "#/lib/mock-smart-devices";
+  getSmartDeviceMap,
+  getSmartDevicesSnapshot,
+} from "#/lib/smart-devices-snapshot";
 
 export const Route = createFileRoute("/$organizationSlug/groups")({
   component: GroupsRoute,
@@ -14,8 +14,8 @@ export const Route = createFileRoute("/$organizationSlug/groups")({
 function GroupsRoute() {
   const { organizationSlug } = Route.useParams();
   const organization = createSmartDevicesOrganizationContext(organizationSlug);
-  const groups = getMockSmartDeviceGroups(organization.slug);
-  const devicesById = getMockSmartDeviceMap(organization.slug);
+  const snapshot = getSmartDevicesSnapshot(organization.slug);
+  const devicesById = getSmartDeviceMap(snapshot);
 
   return (
     <AppShell organization={organization}>
@@ -25,12 +25,13 @@ function GroupsRoute() {
         fallbackLabel="Groups"
         fallbackIcon="panels-top-left"
       >
-        Mock Zigbee2MQTT group discovery data scoped to this organization. Live
-        group discovery will replace this data source later.
+        Smart Devices group snapshot data scoped to this organization. The
+        current provider is mock-backed and can be swapped for live MQTT
+        discovery later.
       </SmartDevicesPage>
 
       <section className="data-grid" aria-label="Discovered groups">
-        {groups.map((group) => (
+        {snapshot.groups.map((group) => (
           <article className="data-card" key={group.id}>
             <div className="data-card__header">
               <div>
