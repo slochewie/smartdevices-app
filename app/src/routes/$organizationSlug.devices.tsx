@@ -4,6 +4,10 @@ import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 import { createDeviceCommandIntents } from "#/lib/smart-devices-commands";
 import { getSmartDevicesSnapshot } from "#/lib/smart-devices-snapshot";
+import {
+  createZigbee2MqttPublishRequest,
+  formatMqttPayloadPreview,
+} from "#/lib/zigbee2mqtt-publish";
 
 export const Route = createFileRoute("/$organizationSlug/devices")({
   component: DevicesRoute,
@@ -66,19 +70,24 @@ function DevicesRoute() {
               </dl>
 
               <div className="command-bar" aria-label={`${device.friendlyName} controls`}>
-                {commandIntents.map((intent) => (
-                  <button
-                    key={intent.id}
-                    type="button"
-                    className="command-button"
-                    disabled={!intent.enabled}
-                    title={`${intent.disabledReason} ${intent.topic} ${JSON.stringify(
-                      intent.payload,
-                    )}`}
-                  >
-                    {intent.payload.state === "on" ? "Turn on" : "Turn off"}
-                  </button>
-                ))}
+                {commandIntents.map((intent) => {
+                  const publishRequest = createZigbee2MqttPublishRequest(intent);
+
+                  return (
+                    <button
+                      key={intent.id}
+                      type="button"
+                      className="command-button"
+                      disabled={!intent.enabled}
+                      title={`${intent.disabledReason} ${publishRequest.topic} ${formatMqttPayloadPreview(
+                        publishRequest,
+                      )}`}
+                    >
+                      <span>{intent.payload.state === "on" ? "Turn on" : "Turn off"}</span>
+                      <code>{formatMqttPayloadPreview(publishRequest)}</code>
+                    </button>
+                  );
+                })}
               </div>
             </article>
           );
