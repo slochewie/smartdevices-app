@@ -5,6 +5,7 @@ import { NiteOwlNavigationIcon } from "@niteowl/ui/navigation";
 const SMART_DEVICES_APP = appDefinitionsById["smart-devices"];
 
 type SmartDevicesPageProps = {
+  organizationSlug: string;
   pageId: string;
   fallbackLabel: string;
   fallbackIcon: string;
@@ -12,6 +13,7 @@ type SmartDevicesPageProps = {
 };
 
 export function SmartDevicesPage({
+  organizationSlug,
   pageId,
   fallbackLabel,
   fallbackIcon,
@@ -27,7 +29,7 @@ export function SmartDevicesPage({
         <NiteOwlNavigationIcon icon={icon} />
       </div>
       <div>
-        <p className="page-card__eyebrow">Smart Devices</p>
+        <p className="page-card__eyebrow">Smart Devices · /{organizationSlug}</p>
         <h2>{label}</h2>
         <p className="page-card__description">{children}</p>
       </div>
