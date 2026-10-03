@@ -33,6 +33,20 @@ export type SmartDevicesMqttConfig = {
   lastCheckedAt?: string;
 };
 
+export type SmartDevicesRetainedMqttMessage = {
+  topic: string;
+  payload: unknown;
+  retain: boolean;
+  capturedAt: string;
+};
+
+export type SmartDevicesRetainedMqttSnapshot = {
+  organizationSlug: string;
+  baseTopic: string;
+  messages: SmartDevicesRetainedMqttMessage[];
+  capturedAt: string;
+};
+
 export type Zigbee2MqttExposeFeature = {
   name?: string;
   property?: string;
