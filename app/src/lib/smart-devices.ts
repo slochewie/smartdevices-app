@@ -38,7 +38,7 @@ export type SmartDeviceCommandIntent = {
   organizationSlug: string;
   targetType: SmartDeviceControlTarget;
   targetId: string;
-  topic: string;
+  zigbee2MqttEntity: string;
   command: "turn-on" | "turn-off";
   payload: {
     state: SmartDevicePowerState;
@@ -80,7 +80,7 @@ export type SmartDevice = {
   organizationSlug: string;
   friendlyName: string;
   kind: SmartDeviceKind;
-  topic: string;
+  zigbee2MqttEntity: string;
   availability: SmartDeviceAvailability;
   room?: string;
   state?: SmartDevicePowerState;
@@ -92,7 +92,7 @@ export type SmartDeviceGroup = {
   id: string;
   organizationSlug: string;
   friendlyName: string;
-  topic: string;
+  zigbee2MqttEntity: string;
   deviceIds: string[];
   room?: string;
   state?: SmartDeviceGroupState;
