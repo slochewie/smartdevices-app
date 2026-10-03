@@ -49,11 +49,6 @@ export function AppShell({ organizationSlug, children }: AppShellProps) {
           </span>
         </Link>
 
-        <div className="app-sidebar__organization" title={organizationSlug}>
-          <span>Organization</span>
-          <strong>{organizationSlug}</strong>
-        </div>
-
         <nav className="app-nav" aria-label="Primary">
           <p className="app-nav__label">Smart Devices</p>
           {primaryItems.map((item) => (
