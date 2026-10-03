@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "#/components/app-shell";
 import { SmartDevicesPage } from "#/components/smart-devices-page";
 import { createSmartDevicesOrganizationContext } from "#/lib/organization-context";
 
@@ -12,16 +11,14 @@ function ScenesRoute() {
   const organization = createSmartDevicesOrganizationContext(organizationSlug);
 
   return (
-    <AppShell organization={organization}>
-      <SmartDevicesPage
-        organization={organization}
-        pageId="scenes"
-        fallbackLabel="Scenes"
-        fallbackIcon="shield-check"
-      >
-        Placeholder for saved device states such as lighting looks, open/close
-        presets, and venue operating modes.
-      </SmartDevicesPage>
-    </AppShell>
+    <SmartDevicesPage
+      organization={organization}
+      pageId="scenes"
+      fallbackLabel="Scenes"
+      fallbackIcon="shield-check"
+    >
+      Placeholder for saved device states such as lighting looks, open/close
+      presets, and venue operating modes.
+    </SmartDevicesPage>
   );
 }
