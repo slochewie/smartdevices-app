@@ -114,10 +114,13 @@ const mockEntityStates: Record<string, Zigbee2MqttDeviceState> = {
   },
 };
 
-export function getMockRetainedMqttSnapshot(organizationSlug: string) {
+export function getMockRetainedMqttSnapshot(
+  organizationSlug: string,
+  baseTopic = MOCK_BASE_TOPIC,
+) {
   return createZigbee2MqttRetainedSnapshot({
     organizationSlug,
-    baseTopic: MOCK_BASE_TOPIC,
+    baseTopic,
     devices: organizationSlug === MOCK_ORGANIZATION_SLUG ? mockDeviceDefinitions : [],
     groups: organizationSlug === MOCK_ORGANIZATION_SLUG ? mockGroupDefinitions : [],
     states: organizationSlug === MOCK_ORGANIZATION_SLUG ? mockEntityStates : {},
